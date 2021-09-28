@@ -40,17 +40,17 @@ public class NetworkUserController : MonoBehaviour
     public void NetworkUpdate(MessageDecoder d) {
         switch(d.ReadInt()) {
             case 3:
-                jump = d.ReadBool();
+                right = d.ReadBool();
             break;
             case 2:
-                left = d.ReadBool();
+                dig = d.ReadBool();
             break;
             case 1:
-                dig = d.ReadBool();
+                left = d.ReadBool();
             break;
             case 0:
             default:
-                right = d.ReadBool();
+                jump = d.ReadBool();
             break;
 
         }
