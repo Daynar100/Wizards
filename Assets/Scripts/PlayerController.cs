@@ -4,30 +4,48 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    Rigidbody2D controller;
     float jumpCooldown = 0;
-    // Start is called before the first frame update
-    void Start()
-    {
-        controller = GetComponent<Rigidbody2D>();
+    private Vector3 velocity = Vector3.zero;
+
+    private CapsuleCollider2D cCollider;
+    void Awake() {
+        cCollider = GetComponent<CapsuleCollider2D>();
     }
 
-    // Update is called once per frame
-    void FixedUpdate()
-    {
-        if (Input.GetKey("w") && IsGrounded() && jumpCooldown <= Time.fixedTime) {
-            jumpCooldown = Time.fixedTime + .4f;
-            controller.AddForce(new Vector2(0,10f),ForceMode2D.Impulse);
-        }
-        if (Input.GetKey("d"))
-            controller.AddForce(new Vector2(20f,0));
-        if (Input.GetKey("a"))
-            controller.AddForce(new Vector2(-20f,0));
-    }
 
     void Update() {
+
+        if (IsGrounded()) {
+            if (Input.GetKey("w") && jumpCooldown <= Time.fixedTime) {
+                jumpCooldown = Time.fixedTime + .4f;
+                velocity.y = 10f;
+            } else if (velocity.y < 0) {
+                velocity.y = 0f;
+            }
+        } else {
+            velocity.y -= 9.1f * Time.deltaTime;
+        }
+        velocity.x = 0;
+        if (Input.GetKey("d"))
+            velocity.x = 9f;
+        if (Input.GetKey("a"))
+            velocity.x = -9f;
+
         if (Input.GetKey("s"))
             MapController.Dig(Mathf.RoundToInt(transform.position.x),Mathf.RoundToInt(transform.position.y));
+
+        Vector3 lastPosition = transform.position;
+        transform.position += velocity * Time.deltaTime;
+        if (Physics2D.OverlapBox(new Vector2(transform.position.x,transform.position.y + 0.4f), new Vector2(0.6f,2f), 0) != null) {
+            transform.position = lastPosition;
+            int exit = 10;
+            while(Physics2D.OverlapBox(new Vector2(transform.position.x,transform.position.y + 0.4f), new Vector2(0.6f,2f), 0) == null && exit > 0) {
+                lastPosition = transform.position;
+                transform.position += velocity * Time.deltaTime * 0.1f;
+                --exit;
+            }
+            transform.position = lastPosition;
+        }
     
         if (Input.GetKeyDown("w")) {
             MessageEncoder e = new MessageEncoder();
