@@ -27,9 +27,9 @@ public class NetworkUserController : MonoBehaviour
             velocity.y -= 9.1f * Time.deltaTime;
         }
         velocity.x = 0;
-        if (left)
-            velocity.x = 9f;
         if (right)
+            velocity.x = 9f;
+        if (left)
             velocity.x = -9f;
 
         Vector3 lastPosition = transform.position;
